@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge — Developer Infrastructure, Simplified</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #FBF7F0;
+      --bg-white:   #FEF9F2;
+      --fg:         #2C1A0E;
+      --fg-muted:   #7C6653;
+      --fg-subtle:  #B09A85;
+      --border:     #EAE0D0;
+      --border-mid: #D9CCBA;
+      --accent:     #8B5E3C;
+      --accent-hover: #7A5030;
+      --accent-soft:  #F5EDE0;
+      --success:    #5A7A52;
+      --tag-bg:     #F2EBE0;
+      --radius-sm:  6px;
+      --radius-md:  10px;
+      --radius-lg:  16px;
+      --shadow-sm:  0 1px 2px rgba(44,26,14,.05);
+      --shadow-md:  0 4px 16px rgba(44,26,14,.07);
+      --shadow-lg:  0 8px 32px rgba(44,26,14,.09);
+      --transition: 160ms ease;
+      --font:       'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ─── Utilities ─── */
+    .container { max-width: 1120px; margin-inline: auto; padding-inline: 24px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250,250,250,.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; gap: 32px;
+      height: 60px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 17px; letter-spacing: -.3px;
+    }
+    .nav-logo-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--fg); display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-icon svg { width: 16px; height: 16px; }
+    .nav-links {
+      display: flex; gap: 24px; list-style: none;
+      margin-inline-start: auto;
+    }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--fg-muted);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--fg); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; color: var(--fg-muted);
+      background: transparent; border: none;
+      transition: background var(--transition), color var(--transition);
+    }
+    .btn-ghost:hover { background: var(--tag-bg); color: var(--fg); }
+    .btn-primary {
+      padding: 8px 18px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 600; color: #fff;
+      background: var(--fg); border: none;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .btn-primary:hover { background: #1F2937; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+    .btn-primary:active { transform: scale(.97); }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 999px;
+      background: var(--tag-bg); border: 1px solid var(--border);
+      font-size: 12px; font-weight: 600; color: var(--fg-muted);
+      letter-spacing: .04em; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(.8); }
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5.5vw, 64px);
+      font-weight: 800; line-height: 1.1; letter-spacing: -.03em;
+      max-width: 780px; margin-inline: auto; margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #8B5E3C 0%, #C4884F 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 19px); color: var(--fg-muted);
+      max-width: 540px; margin-inline: auto; margin-bottom: 36px;
+      font-weight: 400; line-height: 1.65;
+    }
+    .hero-ctas {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .btn-cta-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 700; color: #fff;
+      background: var(--fg); border: none;
+      box-shadow: 0 2px 12px rgba(0,0,0,.18);
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .btn-cta-primary:hover { background: #1F2937; box-shadow: 0 4px 20px rgba(0,0,0,.22); transform: translateY(-1px); }
+    .btn-cta-primary:active { transform: scale(.97) translateY(0); }
+    .btn-cta-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 600; color: var(--fg);
+      background: var(--bg-white); border: 1.5px solid var(--border-mid);
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .btn-cta-secondary:hover { background: var(--tag-bg); border-color: var(--fg-muted); transform: translateY(-1px); }
+    .btn-cta-secondary:active { transform: scale(.97) translateY(0); }
+    .hero-note {
+      margin-top: 16px; font-size: 13px; color: var(--fg-subtle);
+    }
+    .hero-note a { color: var(--accent); font-weight: 500; }
+
+    /* ─── HERO VISUAL ─── */
+    .hero-visual {
+      margin-top: 64px; position: relative;
+    }
+    .hero-visual-inner {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,.03);
+      overflow: hidden;
+      max-width: 920px; margin-inline: auto;
+    }
+    .terminal-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 12px 16px;
+      background: #F9FAFB; border-bottom: 1px solid var(--border);
+    }
+    .terminal-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+    }
+    .td-red   { background: #FF5F57; }
+    .td-yellow { background: #FFBD2E; }
+    .td-green { background: #27C93F; }
+    .terminal-title {
+      font-size: 12px; font-weight: 500; color: var(--fg-subtle);
+      margin-inline-start: auto; margin-inline-end: auto;
+      letter-spacing: .01em;
+    }
+    .terminal-body {
+      padding: 28px 32px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 13.5px; line-height: 1.9;
+      background: #FEF9F2; color: #2C1A0E;
+    }
+    .t-comment { color: #B09A85; }
+    .t-keyword { color: #8B5E3C; font-weight: 600; }
+    .t-string  { color: #5A7A52; }
+    .t-fn      { color: #7A5030; }
+    .t-number  { color: #C4884F; }
+    .t-prompt  { color: var(--fg-subtle); user-select: none; }
+    .t-output  { color: var(--fg-muted); }
+    .t-success { color: var(--success); font-weight: 600; }
+    .t-cursor  { display: inline-block; width: 8px; height: 1.1em; background: var(--fg); opacity: .8; animation: blink 1.1s step-end infinite; vertical-align: text-bottom; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ─── LOGOS ─── */
+    .logos { padding: 56px 0; border-top: 1px solid var(--border); }
+    .logos-label {
+      text-align: center; font-size: 13px; font-weight: 500;
+      color: var(--fg-subtle); letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .logos-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 48px; flex-wrap: wrap;
+    }
+    .logo-item {
+      font-size: 15px; font-weight: 700; color: #CBD5E1;
+      letter-spacing: -.02em; white-space: nowrap;
+      font-family: var(--font);
+    }
+
+    /* ─── SECTION HEADER ─── */
+    .section { padding: 88px 0; }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 999px;
+      background: var(--accent-soft); border: 1px solid #C7D2FE;
+      font-size: 12px; font-weight: 600; color: var(--accent);
+      letter-spacing: .05em; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 800; line-height: 1.15; letter-spacing: -.025em;
+      margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--fg-muted); max-width: 520px;
+      line-height: 1.65;
+    }
+    .section-header { margin-bottom: 56px; }
+    .section-header.centered { text-align: center; }
+    .section-header.centered .section-sub { margin-inline: auto; }
+
+    /* ─── FEATURES ─── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .feature-card {
+      background: var(--bg-white);
+      padding: 32px 28px;
+      transition: background var(--transition);
+    }
+    .feature-card:hover { background: var(--bg); }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: var(--radius-sm);
+      background: var(--tag-bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .feature-icon svg { width: 22px; height: 22px; stroke: var(--fg); stroke-width: 1.7; fill: none; }
+    .feature-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 8px;
+      letter-spacing: -.01em;
+    }
+    .feature-desc { font-size: 14px; color: var(--fg-muted); line-height: 1.65; }
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-wrapper {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: center;
+    }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex; gap: 20px; padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--tag-bg); border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--fg-muted);
+      margin-top: 2px;
+    }
+
+    .step-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .step-desc { font-size: 14px; color: var(--fg-muted); line-height: 1.6; }
+    .how-visual {
+      background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px;
+      box-shadow: var(--shadow-md);
+    }
+    .pipeline {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .pipeline-step {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg);
+      font-size: 13px; font-weight: 500;
+    }
+    .pipeline-step.active {
+      border-color: #D9CCBA; background: #F2EBE0; color: var(--accent);
+    }
+    .pipeline-step.done {
+      border-color: #C5D4B8; background: #EDF3E8; color: var(--success);
+    }
+    .pipeline-icon { width: 20px; height: 20px; flex-shrink: 0; }
+    .pipeline-badge {
+      margin-inline-start: auto; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 999px;
+    }
+    .badge-running { background: #F2EBE0; color: var(--accent); }
+    .badge-done    { background: #EDF3E8; color: var(--success); }
+    .badge-queue   { background: var(--tag-bg); color: var(--fg-subtle); }
+    .pipeline-connector {
+      width: 1px; height: 12px; background: var(--border);
+      margin-inline-start: 22px;
+    }
+
+    @media (max-width: 900px) {
+      .how-wrapper { grid-template-columns: 1fr; gap: 40px; }
+      .how-visual { order: -1; }
+    }
+
+    /* ─── METRICS ─── */
+    .metrics { background: #2C1A0E; color: #FEF9F2; padding: 72px 0; }
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 48px; text-align: center;
+    }
+    .metric-value {
+      font-size: 42px; font-weight: 800; letter-spacing: -.03em;
+      line-height: 1;
+    }
+    .metric-label { font-size: 14px; color: #C4A882; margin-top: 6px; font-weight: 400; }
+    .metric-suffix { font-size: 24px; font-weight: 700; }
+
+    @media (max-width: 768px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .tcard {
+      background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .tcard:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .tcard-stars {
+      display: flex; gap: 3px; margin-bottom: 16px;
+    }
+    .star { color: #F59E0B; font-size: 15px; }
+    .tcard-quote {
+      font-size: 14.5px; line-height: 1.7; color: var(--fg);
+      margin-bottom: 20px; font-weight: 400;
+    }
+    .tcard-author { display: flex; align-items: center; gap: 10px; }
+    .tcard-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .tcard-name { font-size: 13px; font-weight: 700; }
+    .tcard-role { font-size: 12px; color: var(--fg-subtle); }
+
+    @media (max-width: 900px) {
+      .testimonials-grid { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; }
+    }
+    @media (min-width: 901px) and (max-width: 1100px) {
+      .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── PRICING ─── */
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .price-card {
+      background: var(--bg-white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 32px 28px;
+      position: relative; transition: box-shadow var(--transition);
+    }
+    .price-card:hover { box-shadow: var(--shadow-md); }
+    .price-card.popular {
+      border-color: var(--fg); box-shadow: var(--shadow-md);
+    }
+    .popular-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--fg); color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 999px;
+    }
+    .price-tier { font-size: 13px; font-weight: 600; color: var(--fg-muted); margin-bottom: 8px; letter-spacing: .05em; text-transform: uppercase; }
+    .price-amount { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 4px; }
+    .price-dollar { font-size: 42px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+    .price-period { font-size: 14px; color: var(--fg-subtle); margin-bottom: 6px; }
+    .price-desc { font-size: 14px; color: var(--fg-muted); margin-bottom: 24px; line-height: 1.5; }
+    .price-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 20px; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-bottom: 28px; }
+    .price-feat {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 14px; color: var(--fg);
+    }
+    .price-feat svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .feat-check { stroke: var(--success); }
+    .feat-cross { stroke: var(--fg-subtle); }
+    .feat-dim { color: var(--fg-subtle); }
+    .btn-plan-primary {
+      width: 100%; padding: 12px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 700; color: #fff;
+      background: var(--fg); border: none;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-plan-primary:hover { background: #1F2937; }
+    .btn-plan-primary:active { transform: scale(.98); }
+    .btn-plan-outline {
+      width: 100%; padding: 12px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 600; color: var(--fg);
+      background: transparent; border: 1.5px solid var(--border-mid);
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+    }
+    .btn-plan-outline:hover { border-color: var(--fg); background: var(--tag-bg); }
+    .btn-plan-outline:active { transform: scale(.98); }
+
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+    }
+
+    /* ─── FAQ ─── */
+    .faq-list { max-width: 680px; margin-inline: auto; }
+    .faq-item {
+      border-bottom: 1px solid var(--border); overflow: hidden;
+    }
+    .faq-question {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 20px 0;
+      font-size: 15px; font-weight: 600; text-align: left;
+      background: transparent; border: none; color: var(--fg);
+      cursor: pointer;
+    }
+    .faq-question:hover { color: var(--accent); }
+    .faq-chevron {
+      flex-shrink: 0; width: 18px; height: 18px;
+      stroke: var(--fg-muted); transition: transform var(--transition);
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      font-size: 14.5px; color: var(--fg-muted); line-height: 1.7;
+      max-height: 0; overflow: hidden;
+      transition: max-height 280ms ease, padding 280ms ease;
+    }
+    .faq-item.open .faq-answer { max-height: 240px; padding-bottom: 20px; }
+
+    /* ─── CTA BANNER ─── */
+    .cta-section { padding: 96px 0; }
+    .cta-inner {
+      background: var(--fg); color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 72px 48px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-inner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 60% 50%, rgba(196,136,79,.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-inner h2 {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 800;
+      letter-spacing: -.03em; line-height: 1.15; margin-bottom: 16px;
+    }
+    .cta-inner p {
+      font-size: 17px; color: #C4A882; margin-bottom: 36px; max-width: 440px; margin-inline: auto 36px;
+    }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-cta-light {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 700; color: var(--fg);
+      background: #fff; border: none;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-cta-light:hover { background: #F3F4F6; }
+    .btn-cta-light:active { transform: scale(.97); }
+    .btn-cta-outline-light {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 600; color: #fff;
+      background: transparent; border: 1.5px solid rgba(255,255,255,.25);
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+    }
+    .btn-cta-outline-light:hover { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.06); }
+    .btn-cta-outline-light:active { transform: scale(.97); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 0 32px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 220px repeat(4, 1fr);
+      gap: 40px; margin-bottom: 48px;
+    }
+
+    .footer-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 16px; margin-bottom: 12px;
+    }
+    .footer-logo-icon {
+      width: 26px; height: 26px; border-radius: 6px;
+      background: var(--fg); display: flex; align-items: center; justify-content: center;
+    }
+    .footer-logo-icon svg { width: 14px; height: 14px; }
+    .footer-tagline { font-size: 13.5px; color: var(--fg-muted); line-height: 1.6; }
+
+    .footer-col-title {
+      font-size: 12px; font-weight: 700; color: var(--fg);
+      text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .footer-links a {
+      font-size: 14px; color: var(--fg-muted);
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: var(--fg); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 24px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--fg-subtle);
+    }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { color: var(--fg-subtle); transition: color var(--transition); }
+    .footer-bottom-links a:hover { color: var(--fg); }
+
+    @media (max-width: 900px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    }
+
+    /* ─── Focus rings for keyboard nav ─── */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ─── Reduced motion ─── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav role="banner">
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo" aria-label="Forge home">
+      <div class="nav-logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 13 L8 3 L13 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 9.5 H11" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      Forge
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-ghost" type="button">Sign in</button>
+      <button class="btn-primary" type="button">Get started free</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="hero-badge-dot" aria-hidden="true"></span>
+      Now in public beta
+    </div>
+    <h1 id="hero-heading">
+      Ship faster with<br />
+      <em>developer infrastructure</em><br />
+      that just works
+    </h1>
+    <p class="hero-sub">
+      Forge gives your team one place to build, deploy, and monitor — with zero config, zero ops overhead, and zero excuses.
+    </p>
+    <div class="hero-ctas">
+      <button class="btn-cta-primary" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Start building free
+      </button>
+      <button class="btn-cta-secondary" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Watch demo
+      </button>
+    </div>
+    <p class="hero-note">Free forever plan available. No credit card required. <a href="#pricing">See pricing →</a></p>
+
+    <div class="hero-visual">
+      <div class="hero-visual-inner" role="img" aria-label="Forge CLI terminal showing a deployment pipeline">
+        <div class="terminal-bar">
+          <div class="terminal-dot td-red"></div>
+          <div class="terminal-dot td-yellow"></div>
+          <div class="terminal-dot td-green"></div>
+          <span class="terminal-title">forge — deploy — main</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">$&nbsp;</span><span class="t-fn">forge</span> deploy <span class="t-string">--env</span> production</div>
+          <div><span class="t-output">  ⠸ Resolving dependencies...</span></div>
+          <div><span class="t-output">  ✓ Build completed in <span class="t-number">1.4s</span></span></div>
+          <div><span class="t-output">  ✓ Tests passed (<span class="t-number">247</span> assertions)</span></div>
+          <div><span class="t-output">  ✓ Container image pushed → registry.forge.dev/app:<span class="t-string">sha256:d9f3a</span></span></div>
+          <div><span class="t-output">  ✓ Rolling deployment started (<span class="t-number">3</span> replicas)</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-success">  ✓ Deployed to production in 12.3s</span></div>
+          <div><span class="t-output">  → <span class="t-string">https://app.yourco.com</span> (<span class="t-number">100%</span> traffic)</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-prompt">$&nbsp;</span><span class="t-cursor" aria-hidden="true"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<section class="logos" aria-label="Trusted by">
+  <div class="container">
+    <p class="logos-label">Trusted by engineering teams at</p>
+    <div class="logos-row" role="list">
+      <span class="logo-item" role="listitem">Acme Corp</span>
+      <span class="logo-item" role="listitem">NexusHQ</span>
+      <span class="logo-item" role="listitem">Strata Labs</span>
+      <span class="logo-item" role="listitem">Orbit.io</span>
+      <span class="logo-item" role="listitem">Veridian</span>
+      <span class="logo-item" role="listitem">Coreform</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features" aria-labelledby="features-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" aria-hidden="true">Features</div>
+      <h2 class="section-title" id="features-heading">Everything your team needs,<br />nothing it doesn't</h2>
+      <p class="section-sub">Built for teams who value clarity, reliability, and not having to babysit infrastructure.</p>
+    </div>
+    <div class="features-grid" role="list">
+
+      <article class="feature-card" role="listitem">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <h3 class="feature-title">Zero-config deployments</h3>
+        <p class="feature-desc">Push to Git and Forge handles the rest. Automatic builds, container packaging, and rollouts — no YAML archaeology required.</p>
+      </article>
+
+      <article class="feature-card" role="listitem">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="feature-title">Real-time observability</h3>
+        <p class="feature-desc">Logs, metrics, and traces in one unified view. Drill into any request in milliseconds — no switching between six different tools.</p>
+      </article>
+
+      <article class="feature-card" role="listitem">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="feature-title">Security by default</h3>
+        <p class="feature-desc">Secrets management, network policies, and SOC 2 compliance baked in. Ship with confidence, not crossed fingers.</p>
+      </article>
+
+      <article class="feature-card" role="listitem">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <h3 class="feature-title">Intelligent autoscaling</h3>
+        <p class="feature-desc">Traffic spikes handled automatically. Scale from 0 to millions of requests without a 3am incident page or a hefty bill.</p>
+      </article>
+
+      <article class="feature-card" role="listitem">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3 class="feature-title">Team collaboration</h3>
+        <p class="feature-desc">Role-based access, audit logs, and per-environment permissions. Your ops team will stop sending angry Slack messages.</p>
+      </article>
+
+      <article class="feature-card" role="listitem">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3 class="feature-title">Any stack, any cloud</h3>
+        <p class="feature-desc">Node, Python, Go, Rust, or anything else. Deploy to AWS, GCP, or your own infra. One CLI, infinite flexibility.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background: var(--bg-white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);" aria-labelledby="how-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag" aria-hidden="true">How it works</div>
+      <h2 class="section-title" id="how-heading">From code to production<br />in three steps</h2>
+      <p class="section-sub">No consultants. No week-long migrations. No excuses.</p>
+    </div>
+    <div class="how-wrapper">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <div class="step-content">
+            <div class="step-title">Connect your repository</div>
+            <p class="step-desc">Link GitHub, GitLab, or Bitbucket in under 30 seconds. Forge auto-detects your stack and configures a sensible build pipeline.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" aria-hidden="true">2</div>
+          <div class="step-content">
+            <div class="step-title">Push your code</div>
+            <p class="step-desc">Every push triggers a build, runs your test suite, and deploys — automatically. Preview deployments for every pull request, included.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num" aria-hidden="true">3</div>
+          <div class="step-content">
+            <div class="step-title">Ship and sleep soundly</div>
+            <p class="step-desc">Forge monitors your deployment, rolls back on anomalies, and pages only when it matters. You focus on features, not firefighting.</p>
+          </div>
+        </div>
+      </div>
+      <div class="how-visual" aria-label="Live pipeline status showing build stages" role="img">
+        <div style="font-size:13px;font-weight:600;color:var(--fg-muted);margin-bottom:16px;letter-spacing:.04em;text-transform:uppercase">Pipeline · main → production</div>
+        <div class="pipeline">
+          <div class="pipeline-step done">
+            <svg class="pipeline-icon" viewBox="0 0 20 20" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 6"/></svg>
+            Source checkout
+            <span class="pipeline-badge badge-done">Done</span>
+          </div>
+          <div class="pipeline-connector" aria-hidden="true"></div>
+          <div class="pipeline-step done">
+            <svg class="pipeline-icon" viewBox="0 0 20 20" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 6"/></svg>
+            Build &amp; lint
+            <span class="pipeline-badge badge-done">Done</span>
+          </div>
+          <div class="pipeline-connector" aria-hidden="true"></div>
+          <div class="pipeline-step done">
+            <svg class="pipeline-icon" viewBox="0 0 20 20" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 6"/></svg>
+            Tests (247 passed)
+            <span class="pipeline-badge badge-done">Done</span>
+          </div>
+          <div class="pipeline-connector" aria-hidden="true"></div>
+          <div class="pipeline-step active">
+            <svg class="pipeline-icon" viewBox="0 0 20 20" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><polyline points="10 6 10 10 13 12"/></svg>
+            Deploy to production
+            <span class="pipeline-badge badge-running">Running</span>
+          </div>
+          <div class="pipeline-connector" aria-hidden="true"></div>
+          <div class="pipeline-step">
+            <svg class="pipeline-icon" viewBox="0 0 20 20" fill="none" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/></svg>
+            Health checks
+            <span class="pipeline-badge badge-queue">Queued</span>
+          </div>
+        </div>
+        <div style="margin-top:20px;font-size:12px;color:var(--fg-subtle);">Updated 3s ago &nbsp;·&nbsp; commit <span style="font-family:monospace;font-size:11px;background:var(--tag-bg);padding:1px 5px;border-radius:3px;">d9f3a1c</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="metrics" aria-label="Platform statistics">
+  <div class="container">
+    <div class="metrics-grid">
+      <div>
+        <div class="metric-value">99<span class="metric-suffix">.99%</span></div>
+        <div class="metric-label">Platform uptime SLA</div>
+      </div>
+      <div>
+        <div class="metric-value">4.2<span class="metric-suffix">M</span></div>
+        <div class="metric-label">Deployments last month</div>
+      </div>
+      <div>
+        <div class="metric-value">&lt;<span class="metric-suffix">15s</span></div>
+        <div class="metric-label">Median deploy time</div>
+      </div>
+      <div>
+        <div class="metric-value">12<span class="metric-suffix">K+</span></div>
+        <div class="metric-label">Engineering teams</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" aria-labelledby="testimonials-heading">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" aria-hidden="true">Testimonials</div>
+      <h2 class="section-title" id="testimonials-heading">Engineers love it.<br />Their managers too.</h2>
+    </div>
+    <div class="testimonials-grid">
+
+      <article class="tcard">
+        <div class="tcard-stars" aria-label="5 out of 5 stars">
+          <span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span>
+        </div>
+        <blockquote class="tcard-quote">"We went from a 45-minute deploy to under 60 seconds. Our on-call rotation went from weekly nightmares to almost never. I cannot overstate how much this has improved morale."</blockquote>
+        <div class="tcard-author">
+          <div class="tcard-avatar" style="background:#8B5E3C;" aria-hidden="true">SL</div>
+          <div>
+            <div class="tcard-name">Sara Lin</div>
+            <div class="tcard-role">VP Engineering · NexusHQ</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="tcard">
+        <div class="tcard-stars" aria-label="5 out of 5 stars">
+          <span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span>
+        </div>
+        <blockquote class="tcard-quote">"I've used every major deploy platform. Forge is the first one where the defaults are actually good. We've barely touched the config in eight months. It just works."</blockquote>
+        <div class="tcard-author">
+          <div class="tcard-avatar" style="background:#5A7A52;" aria-hidden="true">MK</div>
+          <div>
+            <div class="tcard-name">Marcus Kim</div>
+            <div class="tcard-role">Staff Engineer · Strata Labs</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="tcard">
+        <div class="tcard-stars" aria-label="5 out of 5 stars">
+          <span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span><span class="star" aria-hidden="true">★</span>
+        </div>
+        <blockquote class="tcard-quote">"Forge's preview deployments changed how we do code review. Designers can click a link, test the actual feature, and leave feedback — without touching a terminal. Game changer."</blockquote>
+        <div class="tcard-author">
+          <div class="tcard-avatar" style="background:#C4884F;" aria-hidden="true">AP</div>
+          <div>
+            <div class="tcard-name">Alicia Park</div>
+            <div class="tcard-role">Lead Developer · Orbit.io</div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="background: var(--bg-white); border-top: 1px solid var(--border);" aria-labelledby="pricing-heading">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" aria-hidden="true">Pricing</div>
+      <h2 class="section-title" id="pricing-heading">Simple, honest pricing</h2>
+      <p class="section-sub">No seat-based gotchas. No surprise egress fees. Scale with confidence.</p>
+    </div>
+    <div class="pricing-grid">
+
+      <div class="price-card">
+        <div class="price-tier">Hobby</div>
+        <div class="price-amount">
+          <span class="price-dollar">$0</span>
+        </div>
+        <div class="price-period">Free forever</div>
+        <p class="price-desc">For side projects and solo builders exploring what Forge can do.</p>
+        <hr class="price-divider" />
+        <ul class="price-features" role="list">
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            3 projects
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            100 deploys / month
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Community support
+          </li>
+          <li class="price-feat feat-dim" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="4" x2="12" y2="12" class="feat-cross" stroke-width="2"/><line x1="12" y1="4" x2="4" y2="12" class="feat-cross" stroke-width="2"/></svg>
+            Custom domains
+          </li>
+          <li class="price-feat feat-dim" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="4" x2="12" y2="12" class="feat-cross" stroke-width="2"/><line x1="12" y1="4" x2="4" y2="12" class="feat-cross" stroke-width="2"/></svg>
+            Team access
+          </li>
+        </ul>
+        <button class="btn-plan-outline" type="button">Get started free</button>
+      </div>
+
+      <div class="price-card popular" aria-label="Most popular plan">
+        <div class="popular-badge" aria-hidden="true">Most popular</div>
+        <div class="price-tier">Pro</div>
+        <div class="price-amount">
+          <span class="price-dollar">$49</span>
+        </div>
+        <div class="price-period">per team / month</div>
+        <p class="price-desc">For startups and growing teams shipping to production daily.</p>
+        <hr class="price-divider" />
+        <ul class="price-features" role="list">
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Unlimited projects
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Unlimited deploys
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Priority email support
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Custom domains
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Up to 20 team members
+          </li>
+        </ul>
+        <button class="btn-plan-primary" type="button">Start 14-day free trial</button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-amount">
+          <span class="price-dollar" style="font-size:32px;">Custom</span>
+        </div>
+        <div class="price-period">annual contract</div>
+        <p class="price-desc">For large teams needing compliance, SLAs, and dedicated support.</p>
+        <hr class="price-divider" />
+        <ul class="price-features" role="list">
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Everything in Pro
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            SSO / SAML
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            SOC 2 / audit logs
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            Dedicated Slack channel
+          </li>
+          <li class="price-feat" role="listitem">
+            <svg viewBox="0 0 16 16" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 8 6 12 14 4" class="feat-check" stroke-width="2"/></svg>
+            99.99% uptime SLA
+          </li>
+        </ul>
+        <button class="btn-plan-outline" type="button">Talk to sales</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" aria-hidden="true">FAQ</div>
+      <h2 class="section-title" id="faq-heading">Questions, answered</h2>
+    </div>
+    <div class="faq-list" role="list">
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" type="button" aria-expanded="false">
+          How is Forge different from Heroku or Render?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer" role="region">
+          Forge is built for teams who've outgrown platform-as-a-service limitations. You get the simplicity of Heroku with the control of rolling your own infra — native multi-region, advanced networking, and first-class observability included, not bolted on.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" type="button" aria-expanded="false">
+          Can I bring my own cloud account?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer" role="region">
+          Yes. Enterprise plans support BYOC (Bring Your Own Cloud) for AWS, GCP, and Azure. Forge deploys into your VPC, data never leaves your account, and you retain full ownership of your infrastructure.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" type="button" aria-expanded="false">
+          What languages and frameworks are supported?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer" role="region">
+          Any language or framework that runs in a container: Node.js, Python, Go, Ruby, Rust, Java, .NET, and more. If your app builds in Docker it works on Forge, and we provide optimized buildpacks for the most popular stacks so you usually don't even need a Dockerfile.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" type="button" aria-expanded="false">
+          How does billing work exactly?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer" role="region">
+          The Pro plan is a flat monthly fee per team — no per-seat pricing, no deployment limits, no egress surprises. You pay for compute and storage on top, at cost-plus pricing transparently displayed in your dashboard.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" type="button" aria-expanded="false">
+          Can I migrate from my current setup without downtime?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer" role="region">
+          Yes. Forge provides a migration CLI and a step-by-step runbook tailored to your current setup. We support blue-green migrations and can run your old infrastructure in parallel until you're confident. Enterprise customers get a dedicated migration engineer.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-section" aria-labelledby="cta-heading">
+  <div class="container">
+    <div class="cta-inner">
+      <h2 id="cta-heading">Your next deploy should take<br />seconds, not hours.</h2>
+      <p>Join 12,000+ engineering teams who stopped wrestling with infra and started shipping.</p>
+      <div class="cta-btns">
+        <button class="btn-cta-light" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Start building free
+        </button>
+        <button class="btn-cta-outline-light" type="button">Talk to sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 13 L8 3 L13 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 9.5 H11" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          Forge
+        </div>
+        <p class="footer-tagline">Developer infrastructure that gets out of your way. Ship faster. Sleep better.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Product</div>
+        <ul class="footer-links" role="list">
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Roadmap</a></li>
+          <li><a href="#">Status</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Developers</div>
+        <ul class="footer-links" role="list">
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">CLI Reference</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li><a href="#">Integrations</a></li>
+          <li><a href="#">Open Source</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links" role="list">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-links" role="list">
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">DPA</a></li>
+          <li><a href="#">SOC 2</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Forge Technologies, Inc. All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Twitter</a>
+        <a href="#">GitHub</a>
+        <a href="#">Discord</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+</body>
+</html>
